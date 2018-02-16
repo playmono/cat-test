@@ -1,8 +1,4 @@
-scaleFactor = 2.5;
-gameWidth = 256 * scaleFactor;
-gameHeight = 256 * scaleFactor;
-
-var game = new Phaser.Game(gameWidth, gameWidth, Phaser.AUTO, '', {
+gameState = {
 	cursors : null,
 	catknightDirection : 'right',
 	catknightStatus : 'idle',
@@ -142,4 +138,4 @@ var game = new Phaser.Game(gameWidth, gameWidth, Phaser.AUTO, '', {
 
 		this.catknight.animations.play('idle');
 	}
-});
+}

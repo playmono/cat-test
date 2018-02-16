@@ -12,21 +12,21 @@
 <body>
 
 <script src="js/phaser.min.js"></script>
-<!--<<script src="js/menu.js"></script>>-->
+<script src="js/menu.js"></script>
 <script src="js/game.js"></script>
 
 <script>
-/*(function() {
+(function() {
 	scaleFactor = 2.5;
 	gameWidth = 256 * scaleFactor;
 	gameHeight = 256 * scaleFactor;
 
-	var game = new Phaser.Game(320, 480, Phaser.AUTO, "game");
-	game.state.add("Menu", menu);
-	game.state.add("Main", main);
+	var game = new Phaser.Game(gameWidth, gameWidth, Phaser.AUTO, '');
+	game.state.add("menuState", menuState);
+	game.state.add("mainState", gameState);
 
-	game.state.start("Menu");
-})();*/
+	game.state.start("menuState");
+})();
 </script>
 
 </body>
