@@ -17,6 +17,12 @@
 
 <script>
 (function() {
+	<?php if (array_key_exists('d', $_GET)) { ?>
+	debug = true;
+	<?php } else { ?>
+	debug = false;
+	<?php } ?>
+
 	scaleFactor = 2.5;
 	gameWidth = 256 * scaleFactor;
 	gameHeight = 256 * scaleFactor;
@@ -25,7 +31,11 @@
 	game.state.add("menuState", menuState);
 	game.state.add("mainState", gameState);
 
-	game.state.start("menuState");
+	if (debug) {
+		game.state.start("mainState");
+	} else {
+		game.state.start("menuState");
+	}
 })();
 </script>
 
