@@ -15,6 +15,7 @@ gameState = {
 	},
 	batflies : null,
 	batfliesTimers: null,
+	points: 0,
 
 	preload: function() {
 		// Just to debug FPS
@@ -71,7 +72,8 @@ gameState = {
 
 		// Batflies creation
 		this.batflies = this.game.add.group();
-		this.game.time.events.repeat(Phaser.Timer.SECOND * 2, 10, this.createBatfly, this);
+		this.game.time.events.loop(Phaser.Timer.SECOND * 2, this.createBatfly, this, 1);
+		this.game.time.events.loop(Phaser.Timer.SECOND * 5, this.createBatfly, this, 3);
 	},
 
 	update: function() {
@@ -99,6 +101,8 @@ gameState = {
 				_this.game.debug.body(batfly);
 			})
 		}
+
+		this.game.debug.text('Points: ' + this.points, gameWidth - 100, 30);
 	},
 
 	updateActions() {
@@ -202,7 +206,7 @@ gameState = {
 	},
 
 	startAttack: function() {
-		this.attackTimer = this.game.time.now + 200;
+		this.attackTimer = this.game.time.now + 300;
 
 		if (this.catknight.direction == 'right') {
 			x = this.catknight.mainSprite.position.x + 50;
@@ -220,7 +224,7 @@ gameState = {
 		this.catknight.attackSprite.destroy();
 	},
 
-	createBatfly: function() {
+	createBatfly: function(velocityFactor) {
 		var xPositions = [-150, 850];
 		var yPositions = [50, 350];
 
@@ -240,9 +244,9 @@ gameState = {
 		velocityy = [100, -100];
 
 		if (batfly.position.x > 0) {
-			velocityx = -100;
+			velocityx = -100 * velocityFactor;
 		} else {
-			velocityx = 100;
+			velocityx = 100 * velocityFactor;
 		}
 
 		batfly.body.velocity.setTo(velocityx, velocityy[this.game.rnd.integerInRange(0, 1)]);
@@ -266,17 +270,20 @@ gameState = {
 	},
 
 	gameOver : function(catknight, batfly) {
+		this.points = 0;
 		this.game.state.start("menuState");
 	},
 
 	destroyBatfly : function(attackSprite, batfly) {
+		this.points++;
+
 		batflyDead = this.game.add.sprite(batfly.position.x, batfly.position.y, 'batflypoof');
-		batfly.destroy();
 
 		batflyDead.scale.set(scaleFactor);
-		batflyDead.animations.add('dead', [0, 1, 2, 3, 4, 5], 7);
+		batflyDead.animations.add('dead', [0, 1, 2, 3, 4, 5], 21);
 		batflyDead.animations.play('dead');
-		//batfly.destroy();
+
+		batflyDead.events.onAnimationComplete.add(function(batflyDead) { batflyDead.destroy() }, this);
 	}
 
 }
