@@ -1,5 +1,4 @@
 gameState = {
-	attackTimer : 0,
 	batfliesCreationTimer : 0,
 	controls : {
 		cursors : null,
@@ -11,7 +10,8 @@ gameState = {
 		attackSprite: null,
 		shadowSprite: null,	
 		direction : 'right',
-		action: 'idle',
+		status: 'idle',
+		isAttacking : false,
 	},
 	batflies : null,
 	batfliesTimers: null,
@@ -48,6 +48,7 @@ gameState = {
 		this.catknight.mainSprite.smoothed = false;
 		this.catknight.direction = 'right';
 		this.catknight.status = 'idle';
+		this.catknight.isAttacking = false;
 
 		this.catknight.group.add(this.catknight.mainSprite);
 
@@ -108,12 +109,9 @@ gameState = {
 	updateActions() {
 		this.catknight.group.setAll('body.velocity.x', 0);
 
-		if (this.catknight.status == 'attacking' && this.game.time.now >= this.attackTimer) {
-			this.stopAttack();
-		}
-
-		if (this.controls.xKey.justPressed() && this.game.time.now > this.attackTimer) {
-			this.startAttack();
+		if (this.controls.xKey.justPressed() && !this.catknight.isAttacking) {
+			this.catknight.isAttacking = true;
+			this.createSpriteAttack();
 		}
 
 		if (this.controls.cursors.up.justPressed() && this.catknight.mainSprite.body.onFloor()) {
@@ -139,25 +137,19 @@ gameState = {
 			this.catknight.direction = 'right';
 		}
 
-		// Update Attack Hitbox Position
-		if (this.game.time.now < this.attackTimer) {
-			this.catknight.attackSprite.body.velocity.y = this.catknight.mainSprite.body.velocity.y;
-
-			if (this.catknight.direction == 'right') {
-				x = this.catknight.mainSprite.position.x + 50;
-			} else {
-				x = this.catknight.mainSprite.position.x - 130;
-			}
-
-			this.catknight.attackSprite.position.x = x;
-		}
-
 		// Shadow
 		// @todo: hay un desfase de 120 pixeles respecto al catknight no sé por qué
 		if (this.catknight.direction == 'right') {
 			this.catknight.shadowSprite.position.x = this.catknight.mainSprite.position.x - 120;
 		} else {
 			this.catknight.shadowSprite.position.x = this.catknight.mainSprite.position.x + 120;
+		}
+
+		// @todo: every anim should has its own setSize
+		if (this.catknight.isAttacking) {
+			this.catknight.mainSprite.body.setSize(40, 70, 25, 20);
+		} else {
+			this.catknight.mainSprite.body.setSize(40, 50, 25, 40);
 		}
 	},
 
@@ -176,7 +168,7 @@ gameState = {
 			this.catknight.status = 'jumping';
 		}
 
-		if (this.game.time.now < this.attackTimer) {
+		if (this.catknight.isAttacking) {
 			this.catknight.status = 'attacking';
 		}
 	},
@@ -184,7 +176,11 @@ gameState = {
 	updateAnimations: function() {
 		switch (this.catknight.status) {
 			case 'attacking':
-				this.catknight.mainSprite.animations.play('attack');
+				var attackAnim = this.catknight.mainSprite.animations.play('attack');
+
+				attackAnim.onComplete.add(function() {
+					this.catknight.isAttacking = false;
+				}, this)
 			break;
 
 			case 'jumping':
@@ -205,23 +201,26 @@ gameState = {
 		}
 	},
 
-	startAttack: function() {
-		this.attackTimer = this.game.time.now + 300;
+	createSpriteAttack: function() {
+		var msStartAttack = 50;
+		var msEndAttack = 50;
 
-		if (this.catknight.direction == 'right') {
-			x = this.catknight.mainSprite.position.x + 50;
-		} else {
-			x = this.catknight.mainSprite.position.x - 130;
-		}
+		this.game.time.events.add(msStartAttack, function () {
+			if (this.catknight.direction == 'right') {
+				x = this.catknight.mainSprite.position.x + 50;
+			} else {
+				x = this.catknight.mainSprite.position.x - 130;
+			}
 
-		this.catknight.attackSprite = this.catknight.group.create(x, this.catknight.mainSprite.y + 60);
-		this.game.physics.arcade.enable([this.catknight.attackSprite]);
+			this.catknight.attackSprite = this.catknight.group.create(x, this.catknight.mainSprite.y);
+			this.game.physics.arcade.enable([this.catknight.attackSprite]);
 
-		this.catknight.attackSprite.body.setSize(80, 170, 0, 0);
-	},
+			this.catknight.attackSprite.body.setSize(80, 230, 0, 0);
+		}, this);
 
-	stopAttack: function() {
-		this.catknight.attackSprite.destroy();
+		this.game.time.events.add(msStartAttack + msEndAttack, function() {
+			this.catknight.attackSprite.destroy();
+		}, this);
 	},
 
 	createBatfly: function(velocityFactor) {
@@ -278,6 +277,7 @@ gameState = {
 		this.points++;
 
 		batflyDead = this.game.add.sprite(batfly.position.x, batfly.position.y, 'batflypoof');
+		batfly.destroy();
 
 		batflyDead.scale.set(scaleFactor);
 		batflyDead.animations.add('dead', [0, 1, 2, 3, 4, 5], 21);
