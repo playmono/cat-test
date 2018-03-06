@@ -55,7 +55,7 @@ gameState = {
 		// This gives "body" to catknight
 		this.game.physics.arcade.enable([this.catknight.group]);
 
-		this.catknight.mainSprite.body.setSize(40, 50, 25, 40);
+		this.catknight.mainSprite.body.setSize(30, 50, 33, 40);
 		this.catknight.mainSprite.body.gravity.y = 2000;
 		this.catknight.mainSprite.body.collideWorldBounds = true;
 
@@ -144,13 +144,6 @@ gameState = {
 		} else {
 			this.catknight.shadowSprite.position.x = this.catknight.mainSprite.position.x + 120;
 		}
-
-		// @todo: every anim should has its own setSize
-		if (this.catknight.isAttacking) {
-			this.catknight.mainSprite.body.setSize(40, 70, 25, 20);
-		} else {
-			this.catknight.mainSprite.body.setSize(40, 50, 25, 40);
-		}
 	},
 
 	updateCatknightStatus: function() {
@@ -225,7 +218,6 @@ gameState = {
 
 	createBatfly: function(velocityFactor) {
 		var xPositions = [-150, 850];
-		var yPositions = [50, 350];
 
 		var batfly = this.batflies.create(
 			xPositions[this.game.rnd.integerInRange(0, 1)],
@@ -238,7 +230,7 @@ gameState = {
 
 		// Batfly Body
 		this.game.physics.enable(batfly, Phaser.Physics.ARCADE);
-		batfly.body.setSize(40, 30, 5, 10);
+		batfly.body.setSize(20, 20, 15, 20);
 
 		velocityy = [100, -100];
 
