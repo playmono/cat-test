@@ -12,5 +12,5 @@ Press X to start the game and cut.
 ![Screenshof of Cat test game](https://i.ibb.co/YDLPjnt/capture3.png)
 
 ### Credits
-Code: Adrián Granado Blanco
-Graphics: Noé Fernández Sánchez
+- Programming: Adrián Granado Blanco
+- Graphics: Noé Fernández Sánchez
